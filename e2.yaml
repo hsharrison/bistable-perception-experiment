@@ -1,0 +1,120 @@
+design:
+    main:
+        - name: participant
+          ivs:
+            response_type: [discrete, continuous]
+            design: [ascending_first, descending_first]
+          n: 3
+
+    ascending_first:
+        - name: block
+          ivs:
+            design: [ascending, random, descending]
+          order: Ordering
+
+    descending_first:
+        - name: block
+          ivs:
+            design: [descending, random, ascending]
+          order: Ordering
+
+    ascending:
+        - name: trial
+          ivs:
+            image: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          order: [Sorted, 1, ascending]
+
+    random:
+        - name: trial
+          ivs:
+            image: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+    descending:
+        - name: trial
+          ivs:
+            image: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+          order: [Sorted, 1, descending]
+
+stimulus_time: 3
+response_time: 5
+ascii_stimuli: False
+
+instructions:
+    - >
+        Thank you for agreeing to participate in this experiment.
+        We will start with a series of instructions.
+        On each page, press ENTER to continue.
+        If you become confused at any point, ask the experimenter for clarification before continuing.
+
+    - >
+        This experiment involves the way people see various pictures.
+        You will first look at a picture for a short time,
+        then decide whether the picture looks like a man's face or like a woman's figure.
+        
+    - discrete: >
+        After each picture is displayed, press the left arrow key if it looks like a woman's figure,
+        or the right arrow key if it looks like a man's face
+        (you will be reminded of these keys).
+        Even if the picture is ambiguous, you should choose between left (woman's figure) and right (man's face).
+
+      continuous: >
+        After each picture is displayed, you will rate the picture on a scale by moving the cursor left and right using the arrow keys.
+        Moving the cursor to the left signifies "looks more like a woman's figure";
+        moving the cursor to the right signifies "looks more like a man's face"
+        (you will be reminded which is which).
+        If the cursor looks completely like a woman's figure, move the cursor all the way to the left.
+        If the picture looks completely like a man's face, move the cursor all the way to the right.
+        If the picture is ambiguous, leave the cursor closer to the middle.
+        Tapping the arrow keys will move the cursor slowly;
+        hold them down to move the cursor quickly.
+
+    - >
+        We will start with two examples.
+        First you will see a picture, then you will see the correct response.
+        The first example is a picture of man's face.
+        It will disappear automatically after a few seconds.
+
+    - _example_man
+
+    - >
+        The second example is a picture of woman's figure.
+        As before, it will disappear automatically after a few seconds.
+
+    - _example_woman
+
+    - >
+        In the actual experiment, the picture will be visible for a shorter period.
+        After the picture disappears, you will have 5 seconds to make your response.
+        Then the next picture will appear automatically.
+
+    - >
+        Now we will practice giving a response.
+        There will be no image; this is just to get used to moving the cursor with the arrow keys.
+        Press ENTER to continue, then press an arrow key to move the cursor.
+        After 5 seconds, we will automatically move on.
+
+    - _example_response
+
+    - In the experiment, your response is determined by the location of the cursor at the end of the 5 seconds.
+
+    - >
+        This is the end of the instructions.
+        Please let the experimenter know if you have any questions.
+        When you are ready, press ENTER to begin.
+
+example_response_message: >
+    This is the correct response to the previous image.
+    The cursor is denoted by the big letter x in  brackets: "|X|".
+    It is shown below as if you had already pressed the {} arrow key.
+    If this makes sense to you, press ENTER to continue.
+
+interblock_message: >
+    The experiment is now {}/3 complete.
+    Take a short break and press ENTER when you are ready to continue.
+
+exit_message: >
+    You have reached the end of the experiment.
+    Feel free to ask any questions you may have about this research.
+    Thank you for participating!
+
+filename: e2.exp
