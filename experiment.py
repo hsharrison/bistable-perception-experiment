@@ -136,6 +136,7 @@ def display_response_scale(term: Terminal, response_type: str, value: float, dra
     scale = width * ['-']
     scale[idx - 1:idx + 2] = ['|', 'x', '|']
     figlet_scale = figlet(''.join(scale), width=term.width)
+    figlet_scale = '\n'.join(line + (term.width - len(line)) * ' ' for line in figlet_scale.split('\n'))
 
     effective_width = width * FIGLET_SCALE_FACTOR
     x_margin = int((term.width - effective_width) // 2)
