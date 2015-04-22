@@ -1,9 +1,12 @@
 import time
 import sys
-import os.path
-from subprocess import check_output
+import os
+import random
+from subprocess import check_output, Popen
 from contextlib import contextmanager
 from math import floor, ceil
+from tempfile import TemporaryDirectory
+from glob import glob
 
 from experimentator import Experiment
 from experimentator.section import ExperimentSection
@@ -18,20 +21,42 @@ Y_MARGIN = 5
 
 def run_trial(exp: Experiment, trial: ExperimentSection):
     term = exp.session_data['term']
-    image = exp.session_data['stimuli'][trial.data['image']]
+    stimulus_time = exp.experiment_data['stimulus_time']
 
-    show_image(term, image)
-    time.sleep(exp.experiment_data['stimulus_time'])
+    if exp.experiment_data.get('ascii_stimuli', True):
+        image = exp.session_data['stimuli'][trial.data['image']]
+        show_terminal_image(term, image)
+        time.sleep(stimulus_time)
+
+    else:
+        image_path = os.path.join('stimuli', '{:02}.jpg'.format(trial.data['image'] + 1))
+        show_actual_image(image_path, stimulus_time)
 
     return {
         'response': get_response(term, trial.data['response_type'], exp.experiment_data['response_time'])
     }
 
 
-def show_image(term, image):
+def show_terminal_image(term: Terminal, image: str):
     image_width = len(image.split('\n')[0])
     reset(term)
     multiline_print_at_location(term, image, int((term.width - image_width) // 2), 0)
+
+
+def show_actual_image(image_path: str, stimulus_time: float):
+    command = ['eog', '--fullscreen']
+    with isolate_file(image_path) as linked_path:
+        process = Popen(command + [linked_path])
+        time.sleep(stimulus_time)
+        process.kill()
+
+
+@contextmanager
+def isolate_file(path):
+    with TemporaryDirectory() as tmp_dir:
+        target = os.path.join(tmp_dir, 'stimulus.jpg')
+        os.symlink(os.path.abspath(path), target)
+        yield target
 
 
 def get_response(term, response_type, response_time):
@@ -81,7 +106,9 @@ def participant_context(exp: Experiment, participant: ExperimentSection):
 
             if message.startswith('_example'):
                 show_example(term, response_type, message.split('_')[2], exp.session_data['stimuli'],
-                             exp.experiment_data['example_response_message'])
+                             exp.experiment_data['example_response_message'],
+                             ascii_stimuli=exp.experiment_data.get('ascii_stimuli', True),
+                             stimulus_time=8)
 
             else:
                 reset(term)
@@ -110,13 +137,19 @@ def block_context(exp: Experiment, block: ExperimentSection):
     yield
 
 
-def show_example(term: Terminal, response_type: str, example: str, stimuli, message):
+def show_example(term: Terminal, response_type: str, example: str, stimuli, message,
+                 ascii_stimuli=True, stimulus_time=3):
     if example == 'response':
         get_response(term, response_type, 8)
         return
 
-    show_image(term, stimuli[0 if example == 'man' else -1])
-    input()
+    if ascii_stimuli:
+        show_terminal_image(term, stimuli[0 if example == 'man' else -1])
+        input()
+
+    else:
+        image_path = os.path.join('stimuli', '01.jpg' if example == 'man' else '15.jpg')
+        show_actual_image(image_path, stimulus_time)
 
     reset(term)
     display_response_scale(term, response_type, 1 if example == 'man' else -1)
