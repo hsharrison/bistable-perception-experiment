@@ -82,10 +82,10 @@ png('fit-jpeg.png', height = 800, width = 800)
 cusp3d(fit.jpeg, theta = 45)
 dev.off()
 
-fit.1 <- cusp(y ~ response, alpha ~ image, beta ~ image, subset(data, data$participant == 18))
+fit.1 <- cusp(y ~ response, alpha ~ image, beta ~ image, subset(data, data$participant == 24))
 summary(fit.1, logist = TRUE)
 plot(fit.1)
-png('fit-p18.png', height = 800, width = 800)
+png('fit-p24.png', height = 800, width = 800)
 cusp3d(fit.1, theta = 45)
 dev.off()
 
@@ -107,4 +107,4 @@ ggplot(combined, aes(x = image, y = response, color = design, linetype = source)
   image_x + response_y + design_color + source_linetype +
   theme +
   coord_cartesian(ylim = c(-1, 1), xlim = c(1, 15))
-ggsave('p18-model.png', width=14, height=8)
+ggsave('p24-model.png', width=14, height=8)
