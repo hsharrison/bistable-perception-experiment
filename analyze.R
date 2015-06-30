@@ -64,6 +64,22 @@ ggplot(data, aes(
 
 ggsave('all-participants.png', width=20, height=16)
 
+data.jpeg <- subset(data, data$image_type == 'jpeg')
+data.jpeg$participant <- with(data.jpeg, as.integer(participant) - participant %>% unique %>% length) %>% as.factor
+
+ggplot(data.jpeg, aes(
+  x = image,
+  y = response,
+  color = design,
+  fill = design,
+)) +
+geom_hline(aes(intercept = 0, linetype = 'dotted')) +
+geom_line(size = 1, position = position_jitter(width = 0, height = 0.01)) +
+facet_wrap(~ participant + response_type) +
+image_x + response_y + design_color +
+theme
+
+ggsave('all-participants-jpeg.png', width = 10, height = 8)
 
 # Fitting the cusp model
 library(cusp)
