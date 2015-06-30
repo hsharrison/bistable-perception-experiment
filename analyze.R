@@ -82,27 +82,38 @@ png('fit-jpeg.png', height = 800, width = 800)
 cusp3d(fit.jpeg, theta = 45)
 dev.off()
 
-fit.1 <- cusp(y ~ response, alpha ~ image, beta ~ image, subset(data, data$participant == 24))
+fit.1 <- cusp(y ~ response, alpha ~ image, beta ~ image, subset(data, data$participant == 24 & data$design != 'random'))
 summary(fit.1, logist = TRUE)
 plot(fit.1)
 png('fit-p24.png', height = 800, width = 800)
 cusp3d(fit.1, theta = 45)
 dev.off()
 
-n <- nrow(fit.1$data)
-combined <- rbind(fit.1$data, fit.1$data)
-combined$source <- as.factor(c(rep('observed', n), rep('model', n)))
+predict.cusp <- function(mdl) {
+  n <- nrow(mdl$data)
+  combined <- rbind(mdl$data, mdl$data)
+  combined$source <- as.factor(c(rep('observed', n), rep('model', n)))
+  
+  m <- mdl$coefficients[['w[response]']]
+  b <- mdl$coefficients[['w[(Intercept)]']]
+  
+  rows <- combined$source == 'model'
+  combined[rows, 'response'] <- (mdl$fitted - b) / m
+  
+  return(combined)
+}
 
+library(plyr)
 
-m <- fit.1$coefficients[['w[response]']]
-b <- fit.1$coefficients[['w[(Intercept)]']]
-
-rows <- combined$source == 'model'
-combined[rows, 'response'] <- (fit.1$fitted - b) / m
+p24 <- subset(data, data$participant == 24 & data$design != 'random')
+fits.p24 <- ddply(
+  p24, .(design),
+  . %>% cusp(y ~ response, alpha ~ image, beta ~ image, .) %>% predict.cusp
+)
 
 source_linetype <- scale_linetype_discrete(name = 'Data', breaks = c('observed', 'model'))
 
-ggplot(combined, aes(x = image, y = response, color = design, linetype = source)) +
+ggplot(fits.p24, aes(x = image, y = response, color = design, linetype = source)) +
   geom_line(size = 1.5) +
   image_x + response_y + design_color + source_linetype +
   theme +
